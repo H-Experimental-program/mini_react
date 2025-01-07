@@ -22,6 +22,8 @@ export function createContainer(container: Container) {
 // 创建 update, 并将 update enqueue 到 updateQueue 中
 // 将首屏渲染与触发更新的机制相连接
 export function updateContainer(
+  // reactDom.createRoot(root).render(<App/>)
+  // 其中 <App/> 组件对应的 element 就是此处的 element
   element: ReactElementType | null,
   root: FiberRootNode
 ) {
