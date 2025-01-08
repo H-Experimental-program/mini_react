@@ -42,7 +42,8 @@ export const beginWork = (wip: FiberNode) => {
       }
       break;
   }
-  return wip;
+
+  return null;
 };
 
 /**
@@ -75,8 +76,6 @@ function updateHostComponent(wip: FiberNode) {
   reconcilerChildren(wip, nextChildren);
   return wip.child;
 }
-
-function updateHostText(wip: FiberNode) {}
 
 /**
  *
