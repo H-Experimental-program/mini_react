@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/react.config.js",
+    "build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
     "prepare": "husky",
     "lint": "eslint --fix --quiet ./packages"
   },
@@ -35,6 +35,7 @@
   },
   "private": true,
   "dependencies": {
+    "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-replace": "^6.0.2"
   }
 }

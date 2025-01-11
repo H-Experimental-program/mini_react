@@ -117,11 +117,13 @@ function commitRoot(root: FiberRootNode) {
     // beforeMutation
     // mutation Placement
     commitMutationEffects(finishedWork);
+
     root.current = finishedWork;
+
     // layout
   } else {
     root.current = finishedWork;
   }
 
-  throw new Error('Function not implemented.');
+  console.warn('commitRoot: Function not implemented.');
 }

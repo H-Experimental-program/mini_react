@@ -2,6 +2,7 @@
 
 import {
   appendInitialChild,
+  Container,
   createInstance,
   createTextInstance
 } from 'hostConfig';
@@ -58,7 +59,7 @@ export const completeWork = (wip: FiberNode) => {
  *
  * @explain 在 parent 中插入 wip
  */
-function appendAllChildren(parent: FiberNode, wip: FiberNode) {
+function appendAllChildren(parent: Container, wip: FiberNode) {
   let node = wip.child;
 
   // wip 可能不是一个 dom 节点
