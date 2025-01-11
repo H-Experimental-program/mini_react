@@ -5,10 +5,10 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
     "prepare": "husky",
-    "lint": "eslint --fix --quiet ./packages"
+    "lint": "eslint --fix --quiet ./packages",
+    "build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
+    "demo": "vite serve demos/test-fc --config scripts/vite/vite.config.js --force"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
@@ -26,8 +26,14 @@
     "rollup": "^4.29.1",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-typescript2": "^0.36.0",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.18.2"
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.18.2",
+    "vite": "^6.0.5"
   },
   "volta": {
     "node": "22.12.0",
