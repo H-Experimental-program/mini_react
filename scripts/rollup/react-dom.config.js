@@ -3,7 +3,7 @@ import { getPackageJSON, resolvePkgPath, getBaseRollupPlugins } from './utils';
 
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 
-const { name, module } = getPackageJSON('react-dom');
+const { name, module, peerDependencies } = getPackageJSON('react-dom');
 const pkgPath = resolvePkgPath(name);
 const pkgDistPath = resolvePkgPath(name, true);
 
@@ -23,6 +23,8 @@ export default [
         format: 'umd'
       }
     ],
+    // 数据共享层放在 react 中，不打包进 react-dom
+    externals: [...Object.keys(peerDependencies)],
     plugins: [
       ...getBaseRollupPlugins(),
       // webpack resolve alias
