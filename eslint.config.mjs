@@ -1,4 +1,3 @@
-import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
@@ -13,7 +12,10 @@ export default [
   },
   {
     languageOptions: {
-      globals: globals.browser
+      globals: {
+        browser: true,
+        jest: true
+      }
     }
   },
   pluginJs.configs.recommended,
@@ -21,6 +23,7 @@ export default [
   {
     // 规则配置
     rules: {
+      'no-undef': 'off',
       'prefer-const': 'off',
       'no-case-declarations': 'off',
       'no-constant-condition': 'off',
@@ -28,6 +31,7 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       'no-unused-vars': 'off'
     }
   }

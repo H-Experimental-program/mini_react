@@ -1,10 +1,11 @@
-import alias from '@rollup/plugin-alias';
 import { getPackageJSON, resolvePkgPath, getBaseRollupPlugins } from './utils';
-
 import generatePackageJson from 'rollup-plugin-generate-package-json';
+import alias from '@rollup/plugin-alias';
 
 const { name, module, peerDependencies } = getPackageJSON('react-dom');
+// react-dom包的路径
 const pkgPath = resolvePkgPath(name);
+// react-dom产物路径
 const pkgDistPath = resolvePkgPath(name, true);
 
 export default [
@@ -14,37 +15,31 @@ export default [
     output: [
       {
         file: `${pkgDistPath}/index.js`,
-        name: 'index.js',
+        name: 'ReactDOM',
         format: 'umd'
       },
       {
         file: `${pkgDistPath}/client.js`,
-        name: 'client.js',
+        name: 'client',
         format: 'umd'
       }
     ],
-    // 数据共享层放在 react 中，不打包进 react-dom
-    externals: [...Object.keys(peerDependencies)],
+    external: [...Object.keys(peerDependencies), 'scheduler'],
     plugins: [
       ...getBaseRollupPlugins(),
       // webpack resolve alias
       alias({
         entries: {
-          // tsconfig 中 path 只处理 ts 类型检查
-          // 打包时需要在此处配置
           hostConfig: `${pkgPath}/src/hostConfig.ts`
         }
       }),
       generatePackageJson({
         inputFolder: pkgPath,
         outputFolder: pkgDistPath,
-        // 选择 package.json 中的指定字段
         baseContents: ({ name, description, version }) => ({
           name,
           description,
           version,
-          // peerDependencies 在 npm install 时不会安装
-          // 默认已经存在
           peerDependencies: {
             react: version
           },
@@ -52,5 +47,18 @@ export default [
         })
       })
     ]
+  },
+  // react-test-utils
+  {
+    input: `${pkgPath}/test-utils.ts`,
+    output: [
+      {
+        file: `${pkgDistPath}/test-utils.js`,
+        name: 'testUtils',
+        format: 'umd'
+      }
+    ],
+    external: ['react-dom', 'react'],
+    plugins: getBaseRollupPlugins()
   }
 ];

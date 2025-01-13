@@ -25,6 +25,22 @@ const ReactElement = function (
   };
 };
 
+function hasValidKey(config: any) {
+  return config.key !== undefined;
+}
+
+function hasValidRef(config: any) {
+  return config.ref !== undefined;
+}
+
+export function isValidElement(obj: any) {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    obj.$$typeof === REACT_ELEMENT_TYPE
+  );
+}
+
 export const jsx = (type: ElementType, config: any, ...maybeChildren: any) => {
   let key: Key = null;
   let props: Props = {};
@@ -34,15 +50,15 @@ export const jsx = (type: ElementType, config: any, ...maybeChildren: any) => {
     const val = config[prop];
 
     if (prop === 'key') {
-      if (val !== undefined) {
+      if (hasValidKey(config)) {
         key = '' + val;
       }
 
       continue;
     }
 
-    if (prop === 'ref') {
-      if (val !== undefined) {
+    if (prop === 'ref' && val !== undefined) {
+      if (hasValidRef(config)) {
         ref = val;
       }
 
@@ -52,16 +68,16 @@ export const jsx = (type: ElementType, config: any, ...maybeChildren: any) => {
     if ({}.hasOwnProperty.call(config, prop)) {
       props[prop] = val;
     }
+  }
 
-    const maybeChildrenLength = maybeChildren.length;
+  const maybeChildrenLength = maybeChildren.length;
 
-    if (maybeChildrenLength) {
-      // child or [child, ...]
-      if (maybeChildrenLength === 1) {
-        props.children = maybeChildren[0];
-      } else {
-        props.children = maybeChildren;
-      }
+  if (maybeChildrenLength) {
+    // child or [child, ...]
+    if (maybeChildrenLength === 1) {
+      props.children = maybeChildren[0];
+    } else {
+      props.children = maybeChildren;
     }
   }
 
