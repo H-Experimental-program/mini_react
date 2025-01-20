@@ -50,6 +50,7 @@ export class FiberNode {
   // - 对应操作的标记（插入、删除、移动...）
   flags: Flags;
   subtreeFlags: Flags;
+  deletions: FiberNode[] | null;
 
   constructor(tag: WorkTag, pendingProps: Props, key: Key) {
     // 实例
@@ -86,6 +87,7 @@ export class FiberNode {
     // 副作用
     this.flags = NoFlags;
     this.subtreeFlags = NoFlags;
+    this.deletions = null;
   }
 }
 
@@ -122,6 +124,7 @@ export const createWorkInProgress = (
     // 清除遗留副作用
     wip.flags = NoFlags;
     wip.subtreeFlags = NoFlags;
+    wip.deletions = null;
   }
 
   wip.type = current.type;

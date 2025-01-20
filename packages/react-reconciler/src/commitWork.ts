@@ -1,7 +1,23 @@
-import { appendChildToContainer, Container } from 'hostConfig';
+import {
+  appendChildToContainer,
+  commitUpdate,
+  Container,
+  removeChild
+} from 'hostConfig';
 import { FiberNode, FiberRootNode } from './fiber';
-import { MutationMask, NoFlags, Placement } from './fiberFlags';
-import { HostComponent, HostRoot, HostText } from './workTags';
+import {
+  ChildDeletion,
+  MutationMask,
+  NoFlags,
+  Placement,
+  Update
+} from './fiberFlags';
+import {
+  FunctionComponent,
+  HostComponent,
+  HostRoot,
+  HostText
+} from './workTags';
 
 /**
  * @explain
@@ -55,19 +71,99 @@ const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
     // 移除 Placement
     finishedWork.flags &= ~Placement;
   }
+  if ((flags & Update) !== NoFlags) {
+    commitUpdate(finishedWork);
+    finishedWork.flags &= ~Update;
+  }
+  if ((flags & ChildDeletion) !== NoFlags) {
+    const deletions = finishedWork.deletions;
+
+    if (deletions !== null) {
+      deletions.forEach((childToDelete) => {
+        commitDeletion(childToDelete);
+      });
+    }
+    finishedWork.flags &= ~ChildDeletion;
+  }
 };
 
 function commitPlacement(finishedWork: FiberNode) {
   if (__DEV__) {
     console.warn('[[execute Placement operate]]', finishedWork);
   }
-
   // parent dom
   const hostParent = getHostParent(finishedWork);
-
   // finishedWork ~ dom append parent dom
   if (hostParent !== null) {
     appendPlacementNodeIntoContainer(finishedWork, hostParent);
+  }
+}
+
+/**
+ * 删除需要考虑：
+ * HostComponent：需要遍历他的子树，为后续解绑ref创造条件，HostComponent本身只需删除最上层节点即可
+ * FunctionComponent：effect相关hook的执行，并遍历子树
+ */
+function commitDeletion(childToDelete: FiberNode) {
+  let rootHostNode: FiberNode | null = null;
+  commitNestedUnmounts(childToDelete, (unmountFiber) => {
+    switch (unmountFiber.tag) {
+      case HostComponent:
+        if (rootHostNode === null) {
+          rootHostNode = unmountFiber;
+        }
+        // todo: unbind ref
+        return;
+      case HostText:
+        if (rootHostNode === null) {
+          rootHostNode = unmountFiber;
+        }
+        return;
+      case FunctionComponent:
+        // todo: useEffect unmount
+        return;
+      default:
+        if (__DEV__) {
+          console.warn(
+            '[[commitDeletion]] untreated unmount type',
+            unmountFiber
+          );
+        }
+        break;
+    }
+  });
+
+  if (rootHostNode !== null) {
+    const hostParent = getHostParent(childToDelete);
+    if (hostParent !== null) {
+      removeChild((rootHostNode as FiberNode).stateNode, hostParent);
+    }
+  }
+}
+
+function commitNestedUnmounts(
+  root: FiberNode,
+  onCommitUnmount: (unmountFiber: FiberNode) => void
+) {
+  let node = root;
+  while (true) {
+    onCommitUnmount(node);
+    if (node.child !== null) {
+      node.child.return = node;
+      node = node.child;
+      continue;
+    }
+    if (node === root) {
+      return;
+    }
+    while (node.sibling === null) {
+      if (node.return === null || node.return === root) {
+        return;
+      }
+      node = node.return;
+    }
+    node.sibling.return = node.return;
+    node = node.sibling;
   }
 }
 

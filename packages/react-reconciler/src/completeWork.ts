@@ -13,7 +13,11 @@ import {
   HostRoot,
   HostText
 } from './workTags';
-import { NoFlags } from './fiberFlags';
+import { NoFlags, Update } from './fiberFlags';
+
+function markUpdate(fiber: FiberNode) {
+  fiber.flags |= Update;
+}
 
 /**
  *
@@ -25,7 +29,6 @@ import { NoFlags } from './fiberFlags';
 export const completeWork = (wip: FiberNode) => {
   const newProps = wip.pendingProps;
   const current = wip.alternate;
-
   switch (wip.tag) {
     case HostComponent:
       if (current !== null && wip.stateNode) {
@@ -42,6 +45,11 @@ export const completeWork = (wip: FiberNode) => {
     case HostText:
       if (current !== null && wip.stateNode) {
         // update
+        const oldText = current.memorizedProps.content;
+        const newText = newProps.content;
+        if (oldText !== newText) {
+          markUpdate(wip);
+        }
       } else {
         // 1. 构建 dom
         const instance = createTextInstance(newProps.content);
@@ -69,7 +77,6 @@ export const completeWork = (wip: FiberNode) => {
  */
 function appendAllChildren(parent: Container, wip: FiberNode) {
   let node = wip.child;
-
   // wip 可能不是一个 dom 节点
   // 递归的查找 HostComponent 和 HostText 类型的节点
   while (node !== null) {
@@ -80,19 +87,15 @@ function appendAllChildren(parent: Container, wip: FiberNode) {
       node = node.child;
       continue;
     }
-
     if (node === wip) {
       return;
     }
-
     while (node.sibling === null) {
       if (node.return === null || node.return === wip) {
         return;
       }
-
       node = node?.return;
     }
-
     node.sibling.return = node.return;
     node = node.sibling;
   }
