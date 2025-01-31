@@ -4,6 +4,7 @@
     "./packages/**/*"
   ],
   "compilerOptions": {
+    "jsx": "preserve",
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
