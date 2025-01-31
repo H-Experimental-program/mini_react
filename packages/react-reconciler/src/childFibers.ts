@@ -194,26 +194,29 @@ function ChildReconciler(shouldTrackEffects: boolean) {
           }
           break;
       }
+
       if (Array.isArray(newChild)) {
         return reconcileChildrenArray(returnFiber, currentFiberNode, newChild);
       }
-      // HostText
-      if (typeof newChild === 'string' || typeof newChild === 'number') {
-        return placeSingleChild(
-          reconcileSingleTextNode(returnFiber, currentFiberNode, newChild)
-        );
-      }
+
       if (currentFiberNode !== null) {
         deleteChild(returnFiber, currentFiberNode);
       }
-      if (__DEV__) {
-        console.warn(
-          '[[reconcileChildFibers]] unrealized reconcile type',
-          newChild
-        );
-      }
-      return null;
     }
+    // HostText
+    if (typeof newChild === 'string' || typeof newChild === 'number') {
+      return placeSingleChild(
+        reconcileSingleTextNode(returnFiber, currentFiberNode, newChild)
+      );
+    }
+
+    if (__DEV__) {
+      console.warn(
+        '[[reconcileChildFibers]] unrealized reconcile type',
+        newChild
+      );
+    }
+    return null;
   }
 
   function updateFromMap(
@@ -231,6 +234,8 @@ function ChildReconciler(shouldTrackEffects: boolean) {
           existingChildren.delete(keyToUse);
 
           return useFiber(before, { content: element + '' });
+        } else {
+          deleteChild(returnFiber, before);
         }
       }
 

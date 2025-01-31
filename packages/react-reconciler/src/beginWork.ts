@@ -1,7 +1,6 @@
 // DFS 前序
 
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
-import { Flags } from './fiberFlags';
 
 import { FiberNode } from './fiber';
 import {
@@ -70,7 +69,7 @@ function updateHostRoot(wip: FiberNode) {
 
   // B 的 reactElement
   const nextChildren = wip.memorizedState;
-  reconcilerChildren(wip, nextChildren);
+  reconcileChildren(wip, nextChildren);
   return wip.child;
 }
 
@@ -81,13 +80,13 @@ function updateHostRoot(wip: FiberNode) {
 function updateHostComponent(wip: FiberNode) {
   const nextProps = wip.pendingProps;
   const nextChildren = nextProps.children;
-  reconcilerChildren(wip, nextChildren);
+  reconcileChildren(wip, nextChildren);
   return wip.child;
 }
 
 function updateFunctionComponent(wip: FiberNode) {
   const nextChildren = renderWithHooks(wip);
-  reconcilerChildren(wip, nextChildren);
+  reconcileChildren(wip, nextChildren);
   return wip.child;
 }
 
@@ -96,7 +95,7 @@ function updateFunctionComponent(wip: FiberNode) {
  * @param wip
  * @param children B 的 reactElement
  */
-function reconcilerChildren(wip: FiberNode, children?: ReactElementType) {
+function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
   // 获取 B 的 current fiberNode
   const current = wip.alternate;
 
